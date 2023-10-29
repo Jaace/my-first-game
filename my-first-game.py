@@ -15,10 +15,13 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (200,300))
         self.gravity = 0
 
+        self.jump_sound = pygame.mixer.Sound('audio/jump.mp3')
+
     def player_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
             self.gravity = -20
+            self.jump_sound.play()
 
     def apply_gravity(self):
         self.gravity += 1
@@ -35,7 +38,9 @@ class Player(pygame.sprite.Sprite):
             self.image = self.player_walk[int(self.player_index)]
 
     def reset(self):
-        self.rect.bottom = 300
+        if self.rect.bottom != 300:
+            print('here')
+            self.rect.bottom = 300
 
     def update(self):
         self.player_input()
@@ -60,17 +65,17 @@ class Obstacle(pygame.sprite.Sprite):
         self.animation_index = 0
         self.image = self.frames[self.animation_index]
         self.rect = self.image.get_rect(midbottom = (randint(900,1100),y_pos))
-    
+
     def animation_state(self):
         self.animation_index += 0.1
         if self.animation_index >= len(self.frames): self.animation_index = 0
         self.image = self.frames[int(self.animation_index)]
-    
+
     def update(self):
         self.animation_state()
         self.rect.x -= 6
         self.destroy()
-    
+
     def destroy(self):
         if self.rect.x <= -100:
             self.kill
@@ -96,6 +101,14 @@ test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
 game_active = False
 start_time = 0
 score = 0
+
+menu_channel = pygame.mixer.Channel(0)
+main_channel = pygame.mixer.Channel(1)
+
+menu_channel.play(pygame.mixer.Sound('audio/menu.mp3'), loops=-1)
+main_channel.play(pygame.mixer.Sound('audio/music.mp3'), loops=-1)
+
+
 # Groups
 player = pygame.sprite.GroupSingle()
 player.add(Player())
@@ -145,6 +158,9 @@ while True:
         screen.blit(ground_surface,(0,300))
         score = display_score()
 
+        menu_channel.pause()
+        main_channel.unpause()
+
         player.draw(screen)
         player.update()
 
@@ -157,6 +173,9 @@ while True:
         Player.reset(player.sprite)
         screen.fill((94,129,162))
         screen.blit(player_stand,player_stand_rect)
+
+        menu_channel.unpause()
+        main_channel.pause()
 
         score_message = test_font.render(f'Your score: {score}',False,(111,196,169))
         score_message_rect = score_message.get_rect(center = (400,330))
