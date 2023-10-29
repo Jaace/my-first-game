@@ -98,7 +98,7 @@ def collision_sprite():
     else: return True
 
 pygame.init()
-debug = True
+debug = False
 screen = pygame.display.set_mode((800, 400))
 pygame.display.set_caption('My First Game')
 clock = pygame.time.Clock()
