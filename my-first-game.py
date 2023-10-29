@@ -39,7 +39,6 @@ class Player(pygame.sprite.Sprite):
 
     def reset(self):
         if self.rect.bottom != 300:
-            print('here')
             self.rect.bottom = 300
 
     def update(self):
@@ -59,9 +58,10 @@ class Obstacle(pygame.sprite.Sprite):
         else:
             snail_1 = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
             snail_2 = pygame.image.load('graphics/snail/snail2.png').convert_alpha()
-            self.frames = [snail_1, snail_2]
+            self.frames = [snail_2, snail_2, snail_2, snail_2, snail_1]
             y_pos = 300
 
+        self.type = type
         self.animation_index = 0
         self.image = self.frames[self.animation_index]
         self.rect = self.image.get_rect(midbottom = (randint(900,1100),y_pos))
@@ -73,7 +73,11 @@ class Obstacle(pygame.sprite.Sprite):
 
     def update(self):
         self.animation_state()
-        self.rect.x -= 6
+        if self.type == 'snail':
+            self.rect.x -= (8 - self.animation_index)
+        else:
+            self.rect.x -= 6
+
         self.destroy()
 
     def destroy(self):
@@ -94,6 +98,7 @@ def collision_sprite():
     else: return True
 
 pygame.init()
+debug = False
 screen = pygame.display.set_mode((800, 400))
 pygame.display.set_caption('My First Game')
 clock = pygame.time.Clock()
@@ -105,8 +110,9 @@ score = 0
 menu_channel = pygame.mixer.Channel(0)
 main_channel = pygame.mixer.Channel(1)
 
-menu_channel.play(pygame.mixer.Sound('audio/menu.mp3'), loops=-1)
-main_channel.play(pygame.mixer.Sound('audio/music.mp3'), loops=-1)
+if not debug:
+    menu_channel.play(pygame.mixer.Sound('audio/menu.mp3'), loops=-1)
+    main_channel.play(pygame.mixer.Sound('audio/music.mp3'), loops=-1)
 
 
 # Groups
