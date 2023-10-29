@@ -65,24 +65,20 @@ class Obstacle(pygame.sprite.Sprite):
         self.animation_index = 0
         self.image = self.frames[self.animation_index]
         self.rect = self.image.get_rect(midbottom = (randint(900,1100),y_pos))
-    
+
     def animation_state(self):
         self.animation_index += 0.1
         if self.animation_index >= len(self.frames): self.animation_index = 0
         self.image = self.frames[int(self.animation_index)]
-    
+
     def update(self):
         self.animation_state()
         self.rect.x -= 6
         self.destroy()
-    
+
     def destroy(self):
         if self.rect.x <= -100:
             self.kill
-
-class Soundtrack(pygame.):
-    def __init__(self,type):
-        super().__init__()
 
 def display_score():
     current_time = int(pygame.time.get_ticks() / 1000) - start_time
@@ -105,17 +101,13 @@ test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
 game_active = False
 start_time = 0
 score = 0
-pygame.mixer.music.load('audio/menu.mp3')
-pygame.mixer.music.play()
 
-pygame.mixer.music.queue()
-# print('GAME ACTIVE')
-# print(game_active)
-# menu_music = pygame.mixer.Sound('audio/menu.mp3')
-# menu_music.play(loops = -1)
+menu_channel = pygame.mixer.Channel(0)
+main_channel = pygame.mixer.Channel(1)
 
-# bg_music = pygame.mixer.Sound('audio/music.mp3')
-# bg_music.play(loops = -1)
+menu_channel.play(pygame.mixer.Sound('audio/menu.mp3'), loops=-1)
+main_channel.play(pygame.mixer.Sound('audio/music.mp3'), loops=-1)
+
 
 # Groups
 player = pygame.sprite.GroupSingle()
@@ -162,21 +154,12 @@ while True:
                 start_time = int(pygame.time.get_ticks() / 1000)
 
     if game_active:
-        # if (pygame.mixer.music.get_busy()):
-        #     print('MUSIC BUSY...')
-        #     pygame.mixer.music.load('audio/music.mp3')
-        #     pygame.mixer.music.unload()
-        #     pygame.mixer.music.stop()
-        # pygame.mixer.music.load('audio/music.mp3')
-        # pygame.mixer.music.load('audio/menu.mp3')
-        # pygame.mixer.music.play()
-        # if (bg_music.play)
-        # bg_music.play(loops = -1)
-        # menu_music.stop()
         screen.blit(sky_surface,(0,0))
         screen.blit(ground_surface,(0,300))
         score = display_score()
-        # bg_music.play()
+
+        menu_channel.pause()
+        main_channel.unpause()
 
         player.draw(screen)
         player.update()
@@ -187,13 +170,12 @@ while True:
         game_active = collision_sprite()
 
     else:
-        # menu_music.play(loops = -1)
-        # bg_music.stop()
-        # pygame.mixer.music.load('audio/menu.mp3')
-        # pygame.mixer.music.play()
         Player.reset(player.sprite)
         screen.fill((94,129,162))
         screen.blit(player_stand,player_stand_rect)
+
+        menu_channel.unpause()
+        main_channel.pause()
 
         score_message = test_font.render(f'Your score: {score}',False,(111,196,169))
         score_message_rect = score_message.get_rect(center = (400,330))
