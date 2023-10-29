@@ -15,10 +15,13 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (200,300))
         self.gravity = 0
 
+        self.jump_sound = pygame.mixer.Sound('audio/jump.mp3')
+
     def player_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
             self.gravity = -20
+            self.jump_sound.play()
 
     def apply_gravity(self):
         self.gravity += 1
@@ -35,7 +38,9 @@ class Player(pygame.sprite.Sprite):
             self.image = self.player_walk[int(self.player_index)]
 
     def reset(self):
-        self.rect.bottom = 300
+        if self.rect.bottom != 300:
+            print('here')
+            self.rect.bottom = 300
 
     def update(self):
         self.player_input()
@@ -75,6 +80,10 @@ class Obstacle(pygame.sprite.Sprite):
         if self.rect.x <= -100:
             self.kill
 
+class Soundtrack(pygame.):
+    def __init__(self,type):
+        super().__init__()
+
 def display_score():
     current_time = int(pygame.time.get_ticks() / 1000) - start_time
     score_surf = test_font.render(f'Score: {current_time}',False,(64,64,64))
@@ -96,6 +105,18 @@ test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
 game_active = False
 start_time = 0
 score = 0
+pygame.mixer.music.load('audio/menu.mp3')
+pygame.mixer.music.play()
+
+pygame.mixer.music.queue()
+# print('GAME ACTIVE')
+# print(game_active)
+# menu_music = pygame.mixer.Sound('audio/menu.mp3')
+# menu_music.play(loops = -1)
+
+# bg_music = pygame.mixer.Sound('audio/music.mp3')
+# bg_music.play(loops = -1)
+
 # Groups
 player = pygame.sprite.GroupSingle()
 player.add(Player())
@@ -141,9 +162,21 @@ while True:
                 start_time = int(pygame.time.get_ticks() / 1000)
 
     if game_active:
+        # if (pygame.mixer.music.get_busy()):
+        #     print('MUSIC BUSY...')
+        #     pygame.mixer.music.load('audio/music.mp3')
+        #     pygame.mixer.music.unload()
+        #     pygame.mixer.music.stop()
+        # pygame.mixer.music.load('audio/music.mp3')
+        # pygame.mixer.music.load('audio/menu.mp3')
+        # pygame.mixer.music.play()
+        # if (bg_music.play)
+        # bg_music.play(loops = -1)
+        # menu_music.stop()
         screen.blit(sky_surface,(0,0))
         screen.blit(ground_surface,(0,300))
         score = display_score()
+        # bg_music.play()
 
         player.draw(screen)
         player.update()
@@ -154,6 +187,10 @@ while True:
         game_active = collision_sprite()
 
     else:
+        # menu_music.play(loops = -1)
+        # bg_music.stop()
+        # pygame.mixer.music.load('audio/menu.mp3')
+        # pygame.mixer.music.play()
         Player.reset(player.sprite)
         screen.fill((94,129,162))
         screen.blit(player_stand,player_stand_rect)
